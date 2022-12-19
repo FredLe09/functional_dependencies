@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include <../func/func.h>
+#include "../func/func.h"
 
 class Relation
 {
@@ -19,6 +19,9 @@ private:
 public:
     Relation();
     ~Relation();
+
+    std::vector<std::string> getKeys();
+    std::vector<std::string> getSupKeys();
 
     void Input();
     void Output();

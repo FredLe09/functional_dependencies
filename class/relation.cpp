@@ -7,6 +7,19 @@ Relation::Relation()
 
 Relation::~Relation() {}
 
+std::vector<std::string> Relation::getKeys()
+{
+    if (this->keys.size() == 0)
+        this->HowToFindKeys();
+    return this->keys;
+}
+std::vector<std::string> Relation::getSupKeys()
+{
+    if (this->supKeys.size() == 0)
+        this->HowToFindKeys();
+    return this->supKeys;
+}
+
 void Relation::Input()
 {
     std::string sTmp;
