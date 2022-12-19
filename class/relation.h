@@ -5,7 +5,9 @@
 class Relation
 {
 private:
+    bool isIntegrity;
     std::string attris;
+    int arrAttri['z' - 'a' + 1]{};
     std::vector<std::pair<std::string, std::string>> FDs;
     std::vector<std::string> keys;
     std::vector<std::string> supKeys;
