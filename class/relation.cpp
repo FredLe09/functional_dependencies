@@ -44,7 +44,7 @@ void Relation::Input()
                 --i;
                 continue;
             }
-
+        s1 = sortStr(s1);
         for (auto &it : s2)
             if (this->arrAttri[it - 'a'] == 0)
             {
@@ -52,7 +52,7 @@ void Relation::Input()
                 --i;
                 continue;
             }
-
+        s2 = sortStr(s2);
         this->FDs.push_back(std::make_pair(s1, s2));
     }
 }
