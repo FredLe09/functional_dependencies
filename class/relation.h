@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <queue>
 #include "../func/func.h"
 
 class Relation

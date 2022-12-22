@@ -23,12 +23,12 @@ std::vector<std::string> Relation::getSupKeys()
 void Relation::Input()
 {
     std::string sTmp;
-    std::cout << "Please input the attributes of the relation: ";
+    std::cout << "Please input the attributes of the relation (ABC...): ";
     std::cin >> sTmp;
     for (int i = 0; i < sTmp.length(); i++)
     {
-        if (sTmp[i] >= 'a' && sTmp[i] <= 'z')
-            this->arrAttris[sTmp[i] - 'a'] = 1;
+        if (sTmp[i] >= 'A' && sTmp[i] <= 'Z')
+            this->arrAttris[sTmp[i] - 'A'] = 1;
         else
         {
             std::cout << "Invalid input!" << std::endl;
@@ -38,9 +38,9 @@ void Relation::Input()
     }
     this->isIntegrity = true;
 
-    for (int i = 0; i < 'z' - 'a' + 1; i++)
+    for (int i = 0; i < 'Z' - 'A' + 1; i++)
         if (this->arrAttris[i] == 1)
-            this->attris += (char)(i + 'a');
+            this->attris += (char)(i + 'A');
 
     int n;
     std::cout << "Please input the number of functional dependencies: ";
@@ -51,7 +51,7 @@ void Relation::Input()
         std::cout << "Please input the " << i + 1 << "th functional dependency: ";
         std::cin >> s1 >> s2;
         for (auto &it : s1)
-            if (this->arrAttris[it - 'a'] == 0)
+            if (this->arrAttris[it - 'A'] == 0)
             {
                 std::cout << "Invalid input! Please input again!!!" << std::endl;
                 --i;
@@ -59,7 +59,7 @@ void Relation::Input()
             }
         s1 = sortStr(s1);
         for (auto &it : s2)
-            if (this->arrAttris[it - 'a'] == 0)
+            if (this->arrAttris[it - 'A'] == 0)
             {
                 std::cout << "Invalid input! Please input again!!!" << std::endl;
                 --i;
@@ -81,9 +81,8 @@ void Relation::Output()
     std::cout << "The attributes of the relation are: " << this->attris << std::endl;
     std::cout << "The functional dependencies of the relation are:" << std::endl;
     for (auto &it : this->FDs)
-    {
-        std::cout << it.first << " -> " << it.second << std::endl;
-    }
+        std::cout << "    \"" << it.first << "\" -> \"" << it.second << "\"" << std::endl;
+    std::cout << std::endl;
 }
 
 void Relation::HowToFindKeys()
@@ -96,25 +95,25 @@ void Relation::HowToFindKeys()
 
     std::cout << "+ Step 1: Find N" << std::endl;
     std::string N = findDisChr(this->arrAttris, this->FDs);
-    std::cout << "    N = " << N << std::endl;
+    std::cout << "    N = \"" << N << "\"" << std::endl;
     std::string coverOfN = this->findCoverAttris(N);
     if (coverOfN == this->attris)
     {
-        std::cout << "    The cover of '" << N << "' are '" << coverOfN << "' that's also exactly all attributes of relation." << std::endl;
+        std::cout << "    The cover of \"" << N << "\" are \"" << coverOfN << "\" that\"s also exactly all attributes of relation." << std::endl;
         this->keys = std::vector<std::string>{N};
         return;
     }
-    std::cout << "    The cover of '" << N << "' are '" << coverOfN << "' != '" << this->attris << "'" << std::endl
+    std::cout << "    The cover of \"" << N << "\" are \"" << coverOfN << "\" != \"" << this->attris << "\"" << std::endl
               << std::endl;
 
     std::cout << "+ Step 2: Find TG: " << std::endl;
     std::string TG = findBoth(this->FDs);
-    std::cout << "    TG = '" << TG << "'" << std::endl;
+    std::cout << "    TG = \"" << TG << "\"" << std::endl;
     std::vector<std::string> CTG = subSet(TG);
-    bool *arrTG = new bool[TG.size()]{};
+    bool *arrTG = new bool[CTG.size()]{};
     std::cout << "    CTG = {";
     for (auto &it : CTG)
-        std::cout << it << ",";
+        std::cout << "\"" << it << "\",";
     std::cout << "\b}" << std::endl
               << std::endl;
 
@@ -124,29 +123,45 @@ void Relation::HowToFindKeys()
         if (arrTG[i])
             continue;
 
-        std::string sTmp1 = sortStr(CTG[i] + N);
-        std::string sTmp2 = this->findCoverAttris(sTmp1);
-        std::cout << std::right << std::setw(4) << N;
-        std::cout << std::right << std::setw(4) << CTG[i];
-        std::cout << std::right << std::setw(8) << sTmp1;
-        std::cout << std::right << std::setw(8) << sTmp2;
-        if (sTmp2 == this->attris)
+        std::string setAttr = sortStr(CTG[i] + N);
+        std::string coverOfSetAttr = this->findCoverAttris(setAttr);
+        std::cout << std::right << std::setw(10) << "\"" + N + "\"";
+        std::cout << std::right << std::setw(10) << "\"" + CTG[i] + "\"";
+        std::cout << std::right << std::setw(20) << "\"" + setAttr + "\"";
+        std::cout << std::right << std::setw(20) << "\"" + coverOfSetAttr + "\"";
+
+        if (coverOfSetAttr == this->attris)
         {
             std::cout << std::right << std::setw(8) << "Yes";
-            this->keys.push_back(CTG[i]);
-            std::cout << " | Remove ";
+            this->keys.push_back(setAttr);
+            std::queue<std::string> que;
+            std::cout << " | ";
             for (int j = i + 1; j < CTG.size(); ++j)
                 if (!arrTG[j] && checkChrsInStr(CTG[i], CTG[j]))
                 {
-                    std::cout << CTG[j] << " ";
+                    que.push(CTG[j]);
                     this->supKeys.push_back(CTG[j]);
                     arrTG[j] = true;
                 }
+
+            if (!que.empty())
+            {
+                std::cout << "Remove ";
+                while (!que.empty())
+                {
+                    std::cout << "\"" << que.front() << "\",";
+                    que.pop();
+                }
+                std::cout << "\b ";
+            }
         }
         else
-            std::cout << std::right << std::setw(8) << "No";
-        std::cout << std::endl;
+            std::cout << std::right << std::setw(8) << "No"
+                      << " | ";
+        std::cout
+            << std::endl;
     }
+    delete[] arrTG;
 }
 
 void Relation::HowToFindNF()
