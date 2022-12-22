@@ -8,5 +8,10 @@ int main()
     r.Input();
     system("cls");
     r.Output();
+
+    r.HowToFindKeys();
+    std::cout << "The keys of this relation are: ";
+    for (auto &it : r.getKeys())
+        std::cout << it << " ";
     return 0;
 }

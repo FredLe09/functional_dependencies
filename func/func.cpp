@@ -31,13 +31,14 @@ bool checkChrsInStr(std::string s1, std::string s2)
 
 std::vector<std::string> subSet(std::string s)
 {
-    std::vector<std::string> res;
-    for (int i = 0; i < (1 << s.length()); i++)
+    std::vector<std::string> res{};
+    for (int i = 1; i < (1 << s.length()); i++)
     {
         std::string tmp;
         for (int j = 0; j < s.length(); j++)
             if (i & (1 << j))
                 tmp += s[j];
+
         res.push_back(tmp);
     }
     return res;

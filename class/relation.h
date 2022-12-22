@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "../func/func.h"
 
 class Relation
@@ -8,7 +9,7 @@ class Relation
 private:
     bool isIntegrity;
     std::string attris;
-    int arrAttri['z' - 'a' + 1]{};
+    int arrAttris['z' - 'a' + 1]{};
     std::vector<std::pair<std::string, std::string>> FDs;
     std::vector<std::string> keys;
     std::vector<std::string> supKeys;
@@ -27,8 +28,9 @@ public:
     void Output();
     void HowToFindKeys();
     void HowToFindNF();
+    std::string findCoverAttris(std::string);
     bool CheckSupKeys(std::string);
-    bool CheckSupKeys(std::vector<std::string>);
+    std::vector<bool> CheckSupKeys(std::vector<std::string>);
     bool CheckFDsInCoverFDs(std::string);
-    bool CheckFDsInCoverFDs(std::vector<std::string>);
+    std::vector<bool> CheckFDsInCoverFDs(std::vector<std::string>);
 };
