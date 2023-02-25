@@ -13,7 +13,7 @@ private:
     int arrAttris['z' - 'a' + 1]{};
     std::vector<std::pair<std::string, std::string>> FDs;
     std::vector<std::string> keys;
-    std::vector<std::string> supKeys;
+
     int normalForm;
     std::vector<std::pair<std::string, std::string>> coverAttris;
     std::vector<std::pair<std::string, std::string>> coverFDs;
@@ -25,13 +25,16 @@ public:
     std::vector<std::string> getKeys();
     std::vector<std::string> getSupKeys();
 
-    void Input();
-    void Output();
-    void HowToFindKeys();
-    void HowToFindNF();
+    void input();
+    void output();
+    void process();
+    void howToFindKeys();
+    void howToFindNF();
     std::string findCoverAttris(std::string);
-    bool CheckSupKeys(std::string);
-    std::vector<bool> CheckSupKeys(std::vector<std::string>);
-    bool CheckFDsInCoverFDs(std::string);
-    std::vector<bool> CheckFDsInCoverFDs(std::vector<std::string>);
+    bool checkKey(std::string);
+    std::vector<bool> checkKeys(std::vector<std::string>);
+    bool checkSupKey(std::string);
+    std::vector<bool> checkSupKeys(std::vector<std::string>);
+    bool checkFDInCoverFDs(std::string, std::string);
+    std::vector<bool> checkFDsInCoverFDs(std::vector<std::pair<std::string, std::string>>);
 };

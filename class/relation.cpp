@@ -5,22 +5,30 @@ Relation::Relation()
     this->isIntegrity = true;
 }
 
+
 Relation::~Relation() {}
+
 
 std::vector<std::string> Relation::getKeys()
 {
     if (this->keys.size() == 0)
-        this->HowToFindKeys();
+        this->process();
     return this->keys;
 }
+
+
 std::vector<std::string> Relation::getSupKeys()
 {
-    if (this->supKeys.size() == 0)
-        this->HowToFindKeys();
-    return this->supKeys;
+    if (this->keys.size() == 0)
+        this->process();
+    
+    std::vector<std::string> supKeys;
+    // TODO: find super keys
+    return supKeys;
 }
 
-void Relation::Input()
+
+void Relation::input()
 {
     std::string sTmp;
     std::cout << "Please input the attributes of the relation (ABC...): ";
@@ -70,7 +78,8 @@ void Relation::Input()
     }
 }
 
-void Relation::Output()
+
+void Relation::output()
 {
     if (!isIntegrity)
     {
@@ -85,7 +94,43 @@ void Relation::Output()
     std::cout << std::endl;
 }
 
-void Relation::HowToFindKeys()
+
+void Relation::process()
+{
+    std::string N = findDisChr(this->arrAttris, this->FDs);
+    std::string coverOfN = this->findCoverAttris(N);
+    if (coverOfN == this->attris)
+    {
+        std::cout << "    The cover of \"" << N << "\" are \"" << coverOfN << "\" that\"s also exactly all attributes of relation." << std::endl;
+        this->keys = std::vector<std::string>{N};
+        return;
+    }
+
+    std::string TG = findBoth(this->FDs);
+    std::vector<std::string> CTG = subSet(TG);
+    bool *arrTG = new bool[CTG.size()]{};           // 0: not cover, 1: cover
+    for (int i = 0; i < CTG.size(); ++i)
+    {
+        if (arrTG[i])
+            continue;
+
+        std::string setAttr = sortStr(CTG[i] + N);
+        std::string coverOfSetAttr = this->findCoverAttris(setAttr);
+        if (coverOfSetAttr == this->attris)
+        {
+            this->keys.push_back(setAttr);
+            for (int j = i + 1; j < CTG.size(); ++j)
+                if (!arrTG[j] && checkChrsInStr(CTG[i], CTG[j]))
+                {
+                    arrTG[j] = true;
+                }
+        }
+    }
+    delete[] arrTG;
+}
+
+
+void Relation::howToFindKeys()
 {
     if (!isIntegrity)
     {
@@ -110,12 +155,12 @@ void Relation::HowToFindKeys()
     std::string TG = findBoth(this->FDs);
     std::cout << "    TG = \"" << TG << "\"" << std::endl;
     std::vector<std::string> CTG = subSet(TG);
-    bool *arrTG = new bool[CTG.size()]{};
     std::cout << "    CTG = {";
     for (auto &it : CTG)
         std::cout << "\"" << it << "\",";
     std::cout << "\b}" << std::endl
               << std::endl;
+    bool *arrTG = new bool[CTG.size()]{};
 
     std::cout << "+ Step 3: Make table like this..." << std::endl;
     for (int i = 0; i < CTG.size(); ++i)
@@ -140,7 +185,6 @@ void Relation::HowToFindKeys()
                 if (!arrTG[j] && checkChrsInStr(CTG[i], CTG[j]))
                 {
                     que.push(CTG[j]);
-                    this->supKeys.push_back(CTG[j]);
                     arrTG[j] = true;
                 }
 
@@ -164,7 +208,7 @@ void Relation::HowToFindKeys()
     delete[] arrTG;
 }
 
-void Relation::HowToFindNF()
+void Relation::howToFindNF()
 {
 }
 
@@ -188,24 +232,46 @@ std::string Relation::findCoverAttris(std::string attris)
     return res;
 }
 
-bool Relation::CheckSupKeys(std::string)
+bool Relation::checkKey(std::string attr)
 {
-    return true;
+    for (auto &it : this->keys)
+        if (attr == it)
+            return true;
+    return false;
 }
 
-std::vector<bool> Relation::CheckSupKeys(std::vector<std::string>)
+std::vector<bool> Relation::checkKeys(std::vector<std::string> attrs)
 {
     std::vector<bool> res;
+    for (auto &it : attrs)
+        res.push_back(this->checkKey(it));
     return res;
 }
 
-bool Relation::CheckFDsInCoverFDs(std::string)
+bool Relation::checkSupKey(std::string attr)
 {
-    return true;
+    std::string coverOfAttr = this->findCoverAttris(attr);
+    return coverOfAttr == this->attris;
 }
 
-std::vector<bool> Relation::CheckFDsInCoverFDs(std::vector<std::string>)
+std::vector<bool> Relation::checkSupKeys(std::vector<std::string> attrs)
 {
     std::vector<bool> res;
+    for (auto &it : attrs)
+        res.push_back(this->checkSupKey(it));
+    return res;
+}
+
+bool Relation::checkFDInCoverFDs(std::string first_FD, std::string second_FD)
+{
+    std::string coverOfFirst_FD = this->findCoverAttris(first_FD);
+    return checkChrsInStr(second_FD, coverOfFirst_FD);
+}
+
+std::vector<bool> Relation::checkFDsInCoverFDs(std::vector<std::pair<std::string, std::string>> FDs)
+{
+    std::vector<bool> res;
+    for (auto &it : FDs)
+        res.push_back(this->checkFDInCoverFDs(it.first, it.second));
     return res;
 }
